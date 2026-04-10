@@ -173,6 +173,9 @@
       font-size:clamp(.82rem,2vw,1rem); color:var(--silver); opacity:.8;
       letter-spacing:.08em; animation:fadeUp 1s 1.3s ease both;
     }
+    #iconLayer { position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+    .float-icon { position:absolute; width:36px; height:36px; opacity:0.08; pointer-events:none; }
+    .float-icon svg { width:100%; height:100%; }
     .site-footer {
       position:fixed; bottom:0; left:0; right:0;
       padding:.6rem 1rem max(.9rem,env(safe-area-inset-bottom));
@@ -207,6 +210,7 @@
 </head>
 <body>
 <canvas id="starCanvas"></canvas>
+<div id="iconLayer"></div>
 <form name="installation-waitlist" method="POST" data-netlify="true"
       netlify-honeypot="bot-field" id="netlifyForm" style="display:none">
   <input type="hidden" name="venture" value="Another Realm Installation">
@@ -229,7 +233,7 @@
     <span class="p-mob">◆&nbsp; Precision Install<br>◆&nbsp; Zero Downtime<br>◆&nbsp; Built to Last</span>
   </p>
   <div class="activate-wrap">
-    <button class="activate-btn" id="activateBtn" onclick="activateWarp()">Schedule Install</button>
+    <button class="activate-btn" id="activateBtn" onclick="activateWarp()" data-label="Schedule Install">Schedule Install</button>
     <div class="ripple" id="ripple1"></div>
     <div class="ripple" id="ripple2"></div>
     <div class="ripple" id="ripple3"></div>
@@ -248,35 +252,86 @@
 </main>
 <footer class="site-footer">&copy; 2026 Another Realm AI International, Inc. &nbsp;|&nbsp; anotherrealminstallation.com</footer>
 <script>
+/* ── Star field — passive twinkling background ── */
 const canvas=document.getElementById('starCanvas'),ctx=canvas.getContext('2d');
-let S=[],warpActive=false,warpIntensity=0;
+let S=[];
 function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
-function initStars(){S=[];for(let i=0;i<240;i++)S.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.2,b:Math.random()*0.5+0.12,ph:Math.random()*Math.PI*2,sp:0.08+Math.random()*0.22,vx:0,vy:0});}
-function resetStarWarp(s){const angle=Math.random()*Math.PI*2,dist=Math.random()*35;s.x=canvas.width/2+Math.cos(angle)*dist;s.y=canvas.height/2+Math.sin(angle)*dist;const spd=0.8+Math.random()*2;s.vx=Math.cos(angle)*spd;s.vy=Math.sin(angle)*spd;s.r=Math.random()*1.6+0.3;}
-function draw(t){
-  if(warpActive){warpIntensity=Math.min(1,warpIntensity+0.008);ctx.fillStyle=`rgba(10,10,10,${0.10+warpIntensity*0.06})`;ctx.fillRect(0,0,canvas.width,canvas.height);}
-  else{if(warpIntensity>0){warpIntensity=Math.max(0,warpIntensity-0.012);ctx.fillStyle=`rgba(10,10,10,${0.10+warpIntensity*0.06})`;ctx.fillRect(0,0,canvas.width,canvas.height);}else{ctx.clearRect(0,0,canvas.width,canvas.height);}}
-  S.forEach(s=>{
-    if(warpActive||warpIntensity>0){
-      const spd=1+warpIntensity*3;s.x+=s.vx*spd;s.y+=s.vy*spd;
-      const vel=Math.sqrt(s.vx*s.vx+s.vy*s.vy),streakLen=warpIntensity*5*vel;
-      if(streakLen>2){ctx.beginPath();ctx.moveTo(s.x-s.vx*streakLen,s.y-s.vy*streakLen);ctx.lineTo(s.x,s.y);const alpha=0.12+warpIntensity*0.26;ctx.strokeStyle=`rgba(210,225,255,${alpha})`;ctx.lineWidth=s.r*0.7;ctx.stroke();}
-      else{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.283);ctx.fillStyle=`rgba(220,232,255,${0.3+warpIntensity*0.35})`;ctx.fill();}
-      if(s.x<-20||s.x>canvas.width+20||s.y<-20||s.y>canvas.height+20)resetStarWarp(s);
-    }else{const a=s.b+(1-s.b)*0.5*(1+Math.sin(s.ph+t*s.sp*0.0005));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.283);ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill();}
-    s.ph+=0.004;
+function initStars(){S=[];for(let i=0;i<200;i++)S.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.4+0.2,b:Math.random()*0.5+0.1,ph:Math.random()*Math.PI*2,sp:0.4+Math.random()*1.2});}
+function drawStars(t){ctx.clearRect(0,0,canvas.width,canvas.height);S.forEach(s=>{const a=s.b+(1-s.b)*0.5*(1+Math.sin(s.ph+t*s.sp*0.001));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.283);ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill();s.ph+=0.006;});requestAnimationFrame(drawStars);}
+resize();initStars();requestAnimationFrame(drawStars);
+window.addEventListener('resize',()=>{resize();initStars();});
+
+/* ── Icon Definitions ── */
+const ICON_DEFS=[
+  {litColor:'#8B5CF6',count:4,svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'},
+  {litColor:'#FFD700',count:4,svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>'},
+  {litColor:'#39FF14',count:3,svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
+  {litColor:'#00CED1',count:3,svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'},
+  {litColor:'#F97316',count:3,svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
+  {litColor:'#FF6EC7',count:3,svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'}
+];
+
+/* ── Floating ambient icons ── */
+const iconLayer=document.getElementById('iconLayer');
+const floatIcons=[];
+(function(){
+  ICON_DEFS.forEach(def=>{
+    for(let i=0;i<def.count;i++){
+      const el=document.createElement('div');
+      el.className='float-icon';el.innerHTML=def.svg;
+      el.style.color=def.litColor;
+      const obj={el,x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+        vx:((Math.random()-.5)*1.0)||(0.3),vy:((Math.random()-.5)*1.0)||(0.3),
+        ph:Math.random()*Math.PI*2,color:def.litColor,warping:false};
+      el.style.left=obj.x+'px';el.style.top=obj.y+'px';
+      iconLayer.appendChild(el);floatIcons.push(obj);
+    }
   });
-  requestAnimationFrame(draw);
+  function tick(t){
+    floatIcons.forEach(ic=>{
+      if(!ic.warping){
+        ic.x+=ic.vx;ic.y+=ic.vy;
+        if(ic.x<-40)ic.x=innerWidth+20;if(ic.x>innerWidth+40)ic.x=-20;
+        if(ic.y<-40)ic.y=innerHeight+20;if(ic.y>innerHeight+40)ic.y=-20;
+        ic.el.style.left=ic.x+'px';ic.el.style.top=ic.y+'px';
+        ic.el.style.opacity=0.07+0.04*Math.sin(ic.ph+t*0.0005);
+        ic.el.style.transform='scale(1)';
+        ic.el.style.filter='none';
+      } else {
+        const cx=innerWidth/2,cy=innerHeight/2;
+        const dx=ic.x-cx,dy=ic.y-cy;
+        const dist=Math.sqrt(dx*dx+dy*dy)||1;
+        const speed=ic.warpSpd*(1+dist/400);
+        ic.x+=ic.wvx*speed;ic.y+=ic.wvy*speed;
+        const sc=Math.max(0.5,Math.min(2.5,dist/100));
+        ic.el.style.transform=`scale(${sc})`;
+        ic.el.style.opacity=String(Math.min(0.85,dist/150));
+        ic.el.style.left=ic.x+'px';ic.el.style.top=ic.y+'px';
+        ic.el.style.filter=`drop-shadow(0 0 ${4*sc}px ${ic.color})`;
+        if(ic.x<-80||ic.x>innerWidth+80||ic.y<-80||ic.y>innerHeight+80)resetWarpIcon(ic);
+      }
+      ic.ph+=0.006;
+    });
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+function resetWarpIcon(ic){
+  const cx=innerWidth/2,cy=innerHeight/2;
+  const angle=Math.random()*Math.PI*2;
+  const r=Math.random()*20+5;
+  ic.x=cx+Math.cos(angle)*r;ic.y=cy+Math.sin(angle)*r;
+  ic.wvx=Math.cos(angle);ic.wvy=Math.sin(angle);
+  ic.warpSpd=0.8+Math.random()*1.2;
+  ic.el.style.left=ic.x+'px';ic.el.style.top=ic.y+'px';
 }
-resize();initStars();requestAnimationFrame(draw);
-window.addEventListener('resize',()=>{resize();if(!warpActive)initStars();});
-function activateWarp(){
-  if(warpActive)return;warpActive=true;
-  S.forEach(s=>{const dx=s.x-canvas.width/2,dy=s.y-canvas.height/2,dist=Math.sqrt(dx*dx+dy*dy)||1,spd=0.5+Math.random()*1.8;s.vx=(dx/dist)*spd;s.vy=(dy/dist)*spd;});
-  ['ripple1','ripple2','ripple3'].forEach((id,i)=>setTimeout(()=>{const r=document.getElementById(id);r.classList.remove('active');void r.offsetWidth;r.classList.add('active');},i*200));
-  const btn=document.getElementById('activateBtn');btn.disabled=true;btn.classList.add('warping');btn.textContent='Entering... ✦';document.getElementById('coreSphere').classList.add('brightened');
-  setTimeout(()=>{warpActive=false;document.getElementById('coreSphere').classList.remove('brightened');setTimeout(()=>{initStars();btn.textContent='Schedule Install';btn.classList.remove('warping');btn.disabled=false;},2800);},7000);
-}
+window.addEventListener('resize',()=>floatIcons.forEach(ic=>{
+  if(ic.x>innerWidth)ic.x=Math.random()*innerWidth;
+  if(ic.y>innerHeight)ic.y=Math.random()*innerHeight;
+}));
+
+/* ── Orbital ── */
 const movers=['m1','m2','m3','m4'].map(id=>document.getElementById(id));
 const coreEl=document.getElementById('coreSphere');
 const PATHS=[
@@ -298,10 +353,32 @@ function cycle(){
   setTimeout(()=>{movers.forEach(m=>{m.style.animation='none';m.style.transition='opacity .5s';m.style.opacity='1';m.style.transform='translate(0px,0px)';});coreEl.classList.remove('brightened');cyc=false;setTimeout(cycle,5000);},rb+3*600+2000+200);
 }
 setTimeout(cycle,3000);
+
+/* ── Activate — icons fly toward user ── */
+let activated=false;
+function activateWarp(){
+  if(activated)return;activated=true;
+  ['ripple1','ripple2','ripple3'].forEach((id,i)=>setTimeout(()=>{
+    const r=document.getElementById(id);r.classList.remove('active');void r.offsetWidth;r.classList.add('active');
+  },i*200));
+  const btn=document.getElementById('activateBtn');
+  btn.disabled=true;btn.classList.add('warping');
+  btn.textContent='Activated ✦';
+  document.getElementById('coreSphere').classList.add('brightened');
+  floatIcons.forEach((ic,idx)=>setTimeout(()=>{ic.warping=true;resetWarpIcon(ic);},idx*40));
+  setTimeout(()=>{
+    floatIcons.forEach(ic=>{ic.warping=false;ic.el.style.transform='scale(1)';ic.el.style.filter='none';ic.el.style.opacity='0.07';});
+    document.getElementById('coreSphere').classList.remove('brightened');
+    setTimeout(()=>{btn.textContent=btn.dataset.label;btn.classList.remove('warping');btn.disabled=false;activated=false;},500);
+  },7000);
+}
+
+/* ── Email ── */
 const SU='https://script.google.com/macros/s/AKfycbxr-7JSECtFFEY84AIi31Vib3TxdUT71N8-fBeJmYCdAXozSxri-r_LFJvJ4p_dvA3eZw/exec';
 async function submitEmail(){
   const inp=document.getElementById('emailInput'),btn=inp.nextElementSibling,email=inp.value.trim();
-  if(!email||!email.includes('@')||!email.includes('.')){showErr('Please enter a valid email.');return;}
+  const emailRe=/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+  if(!email||!emailRe.test(email)){showErr('Please enter a valid email (e.g. name@domain.com)');return;}
   const orig=btn.textContent;btn.textContent='...';btn.disabled=true;let ok=false;
   if(SU){try{const url=SU+'?email='+encodeURIComponent(email)+'&venture='+encodeURIComponent('Another Realm Installation')+'&source='+encodeURIComponent(location.hostname);await fetch(url,{mode:'no-cors'});ok=true;}catch(_){}}
   if(!ok){try{const fd=new FormData();fd.append('form-name','installation-waitlist');fd.append('venture','Another Realm Installation');fd.append('email',email);const r=await fetch('/',{method:'POST',body:fd});if(r.ok)ok=true;}catch(_){ok=true;}}

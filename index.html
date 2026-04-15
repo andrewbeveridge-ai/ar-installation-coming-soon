@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    :root { --gold:#D4AF37; --silver:#B8B8B8; --black:#0A0A0A; --white:#FAFAFA; --accent:#8B5CF6; }
+    :root { --gold:#D4AF37; --silver:#B8B8B8; --black:#0A0A0A; --white:#FAFAFA; --r3:#4169E1;--r4:#39FF14;--core:#39FF14; }
     html { height:100%; -webkit-text-size-adjust:100%; }
     body {
       width:100%; min-height:100%; background:var(--black); color:var(--white); overflow-x:hidden; overflow-y:auto;
@@ -55,27 +55,24 @@
     }
     .ring-3 {
       width:124px; height:50px; top:-25px; left:-62px;
-      border-width:2px; border-color:var(--accent);
-      box-shadow:0 0 8px 2px rgba(139,92,246,.5);
+      border-width:2px; border-color:#4169E1;
+      box-shadow:0 0 8px 2px rgba(65,105,225,.5);
       transform:rotate(-10deg);
     }
     .ring-4 {
       width:100px; height:40px; top:-20px; left:-50px;
-      border-width:1.8px; border-color:var(--accent);
-      box-shadow:0 0 6px 1px rgba(139,92,246,.38);
+      border-width:1.8px; border-color:#39FF14;
+      box-shadow:0 0 8px 2px rgba(57,255,20,.5);
       transform:rotate(15deg);
     }
     .core-sphere {
       position:absolute; top:50%; left:50%;
       width:45px; height:45px; margin:-22.5px 0 0 -22.5px; border-radius:50%;
-      background:radial-gradient(circle at 32% 28%,
-        rgba(139,92,246,.95) 0%, rgba(139,92,246,.48) 42%, rgba(139,92,246,.05) 100%);
-      box-shadow:0 0 18px 6px rgba(139,92,246,.55), 0 0 50px 20px rgba(139,92,246,.18);
+      background:radial-gradient(circle at 32% 28%,rgba(57,255,20,.95) 0%,rgba(57,255,20,.48) 42%,rgba(57,255,20,.05) 100%);
+      box-shadow:0 0 18px 6px rgba(57,255,20,.55),0 0 50px 20px rgba(57,255,20,.18);
       transition:box-shadow .7s ease; z-index:10;
     }
-    .core-sphere.brightened {
-      box-shadow:0 0 28px 12px rgba(139,92,246,.9), 0 0 80px 35px rgba(139,92,246,.4);
-    }
+    .core-sphere.brightened {box-shadow:0 0 28px 12px rgba(57,255,20,.9),0 0 80px 35px rgba(57,255,20,.4);}
     .brand-another {
       font-size:clamp(2.2rem,5.5vw,3.8rem); font-weight:700; letter-spacing:.22em; text-transform:uppercase;
       background:linear-gradient(135deg,var(--gold) 0%,#f5dc6e 35%,var(--gold) 55%,#9a7018 100%);
@@ -116,19 +113,17 @@
     .activate-wrap { margin-bottom:1.6rem; position:relative; animation:fadeUp 1s 1.1s ease both; }
     .activate-btn {
       min-height:44px; padding:.65rem 2.4rem; background:transparent;
-      border:1px solid rgba(139,92,246,.45); color:var(--accent);
+      border:1px solid rgba(57,255,20,.45); color:#39FF14;
       font-family:'Rajdhani',sans-serif; font-size:.75rem; font-weight:600;
       letter-spacing:.28em; text-transform:uppercase; cursor:pointer; border-radius:2px;
       transition:border-color .2s,box-shadow .2s,background .2s; -webkit-tap-highlight-color:transparent;
     }
-    .activate-btn:hover { border-color:var(--accent); box-shadow:0 0 16px rgba(139,92,246,.35); }
+    .activate-btn:hover { border-color:#39FF14; box-shadow: 0 0 16px rgba(57,255,20,.35); }
     .activate-btn.warping {
-      border-color:var(--accent); background:rgba(139,92,246,.06);
-      box-shadow:0 0 24px rgba(139,92,246,.7),0 0 60px rgba(139,92,246,.2);
+      border-color:#39FF14; background:rgba(65,105,225,.06);
+      box-shadow: 0 0 24px rgba(57,255,20,.7),0 0 60px rgba(57,255,20,.2);
     }
-    .ripple {
-      position:absolute; top:50%; left:50%; width:14px; height:14px; margin:-7px 0 0 -7px;
-      border-radius:50%; border:1.5px solid var(--accent); pointer-events:none; opacity:0;
+    .ripple {position:absolute;top:50%;left:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:1.5px solid #39FF14;pointer-events:none;opacity:0; pointer-events:none; opacity:0;
     }
     .ripple.active { animation:rippleOut 1s ease-out forwards; }
     @keyframes rippleOut { 0%{transform:scale(1);opacity:.8;} 100%{transform:scale(32);opacity:0;} }

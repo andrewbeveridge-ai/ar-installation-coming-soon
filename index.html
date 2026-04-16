@@ -46,24 +46,28 @@
       border-width:3.5px; border-color:var(--gold);
       box-shadow:0 0 10px 3px rgba(212,175,55,.6), 0 0 24px 8px rgba(212,175,55,.2);
       transform:rotate(-20deg);
+      animation:ringPulse1 3.5s ease-in-out infinite;
     }
     .ring-2 {
       width:165px; height:66px; top:-33px; left:-82.5px;
       border-width:2.5px; border-color:var(--silver);
       box-shadow:0 0 6px 1px rgba(184,184,184,.4);
       transform:rotate(30deg);
+      animation:ringPulse2 4.2s ease-in-out 0.8s infinite;
     }
     .ring-3 {
       width:124px; height:50px; top:-25px; left:-62px;
       border-width:2px; border-color:#4169E1;
       box-shadow:0 0 8px 2px rgba(65,105,225,.5);
       transform:rotate(-10deg);
+      animation:ringPulse3 2.8s ease-in-out 1.4s infinite;
     }
     .ring-4 {
       width:100px; height:40px; top:-20px; left:-50px;
       border-width:1.8px; border-color:#39FF14;
       box-shadow:0 0 8px 2px rgba(57,255,20,.5);
       transform:rotate(15deg);
+      animation:ringPulse4 3.2s ease-in-out 0.5s infinite;
     }
     .core-sphere {
       position:absolute; top:50%; left:50%;
@@ -179,6 +183,22 @@
     }
     @keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
     @keyframes shimmer { 0%{background-position:250% center;} 100%{background-position:-250% center;} }
+    @keyframes ringPulse1 {
+      0%,100%{box-shadow:0 0 10px 3px rgba(212,175,55,.6),0 0 24px 8px rgba(212,175,55,.2);}
+      50%{box-shadow:0 0 18px 6px rgba(212,175,55,.95),0 0 40px 16px rgba(212,175,55,.45);}
+    }
+    @keyframes ringPulse2 {
+      0%,100%{box-shadow:0 0 6px 1px rgba(184,184,184,.4);}
+      50%{box-shadow:0 0 14px 4px rgba(184,184,184,.85),0 0 28px 10px rgba(184,184,184,.28);}
+    }
+    @keyframes ringPulse3 {
+      0%,100%{box-shadow:0 0 8px 2px rgba(65,105,225,.5);}
+      50%{box-shadow:0 0 16px 5px rgba(65,105,225,.92),0 0 32px 12px rgba(65,105,225,.35);}
+    }
+    @keyframes ringPulse4 {
+      0%,100%{box-shadow:0 0 6px 1px rgba(57,255,20,.38);}
+      50%{box-shadow:0 0 14px 4px rgba(57,255,20,.78),0 0 26px 10px rgba(57,255,20,.28);}
+    }
     @media(max-height:720px){
       .cs-label{margin-bottom:1rem;}
       #orbitalWrap{width:170px;height:170px;margin-bottom:1.2rem;}
@@ -228,7 +248,7 @@
     <span class="p-mob">◆&nbsp; Precision Install<br>◆&nbsp; Zero Downtime<br>◆&nbsp; Built to Last</span>
   </p>
   <div class="activate-wrap">
-    <button class="activate-btn" id="activateBtn" onclick="activateWarp()" data-label="Schedule Install">Schedule Install</button>
+    <button class="activate-btn" id="activateBtn" onclick="activateWarp()" data-label="Activate">Activate</button>
     <div class="ripple" id="ripple1"></div>
     <div class="ripple" id="ripple2"></div>
     <div class="ripple" id="ripple3"></div>
@@ -364,7 +384,7 @@ function activateWarp(){
   setTimeout(()=>{
     floatIcons.forEach(ic=>{ic.warping=false;ic.el.style.transform='scale(1)';ic.el.style.filter='none';ic.el.style.opacity='0.07';});
     document.getElementById('coreSphere').classList.remove('brightened');
-    setTimeout(()=>{btn.textContent=btn.dataset.label;btn.classList.remove('warping');btn.disabled=false;activated=false;},500);
+    setTimeout(()=>{btn.textContent='Activate';btn.classList.remove('warping');btn.disabled=false;activated=false;},500);
   },7000);
 }
 

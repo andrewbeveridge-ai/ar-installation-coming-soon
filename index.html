@@ -230,11 +230,6 @@
 <body>
 <canvas id="starCanvas"></canvas>
 <div id="iconLayer"></div>
-<form name="installation-waitlist" method="POST" data-netlify="true"
-      netlify-honeypot="bot-field" id="netlifyForm" style="display:none">
-  <input type="hidden" name="venture" value="Another Realm Installation">
-  <input type="hidden" name="bot-field"><input type="email" name="email">
-</form>
 <main class="scene">
   <p class="cs-label">Coming Soon</p>
   <div id="orbitalWrap">
@@ -261,6 +256,7 @@
     <label class="form-label">Get Early Access</label>
     <div class="input-row" id="inputRow">
       <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email" inputmode="email">
+      <input type="text" name="_hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
       <button onclick="submitEmail()">Notify Me</button>
     </div>
     <div class="success-msg" id="successMsg">&#10022;&nbsp; You're on the list.</div>
@@ -393,16 +389,19 @@ function activateWarp(){
 }
 
 /* ── Email ── */
-const SU='https://script.google.com/macros/s/AKfycbxr-7JSECtFFEY84AIi31Vib3TxdUT71N8-fBeJmYCdAXozSxri-r_LFJvJ4p_dvA3eZw/exec';
+const CAPTURE='https://bgswqjgswlvdazseyhvu.supabase.co/functions/v1/capture-lead';
 async function submitEmail(){
   const inp=document.getElementById('emailInput'),btn=inp.nextElementSibling,email=inp.value.trim();
   const emailRe=/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
   if(!email||!emailRe.test(email)){showErr('Please enter a valid email (e.g. name@domain.com)');return;}
-  const orig=btn.textContent;btn.textContent='...';btn.disabled=true;let ok=false;
-  if(SU){try{const url=SU+'?email='+encodeURIComponent(email)+'&venture='+encodeURIComponent('Another Realm Installation')+'&source='+encodeURIComponent(location.hostname);await fetch(url,{mode:'no-cors'});ok=true;}catch(_){}}
-  if(!ok){try{const fd=new FormData();fd.append('form-name','installation-waitlist');fd.append('venture','Another Realm Installation');fd.append('email',email);const r=await fetch('/',{method:'POST',body:fd});if(r.ok)ok=true;}catch(_){ok=true;}}
-  if(ok){document.getElementById('inputRow').style.display='none';document.getElementById('successMsg').style.display='block';}
-  else{btn.textContent=orig;btn.disabled=false;showErr('Something went wrong. Try again.');}
+  const orig=btn.textContent;btn.textContent='...';btn.disabled=true;
+  const hp=document.getElementById('hp')?document.getElementById('hp').value:'';
+  try{
+    const r=await fetch(CAPTURE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entity:'CBUS',dba:'Another Realm Installation',source:'web:home',email:email,_hp:hp})});
+    const data=await r.json();
+    if(data&&data.ok){document.getElementById('inputRow').style.display='none';document.getElementById('successMsg').style.display='block';}
+    else{btn.textContent=orig;btn.disabled=false;showErr(data&&data.error||'Something went wrong. Try again.');}
+  }catch(e){btn.textContent=orig;btn.disabled=false;showErr('Something went wrong. Try again.');}
 }
 function showErr(m){const e=document.getElementById('errorMsg');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',4000);}
 document.getElementById('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitEmail();});
